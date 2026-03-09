@@ -5,6 +5,7 @@ URLeaker is a tool that searches for sensitive information in HTML pages using r
 ```sh
 git clone https://github.com/yHunterDep/urleaker/
 cd urleaker/
+pip install -r requirements.txt
 chmod +x urleaker
 ./urleaker -h
 ```
