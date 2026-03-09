@@ -26,7 +26,7 @@ PADRAOS = {
     # === CLOUD / API KEYS ===
     "api": {
     "AWS_ACCESS_KEY": [r"AKIA[0-9A-Z]{16}"],
-    "AWS_SECRET_KEY": [r"(?i)aws(.{0,20})?(secret|private)?(.{0,20})?[=:\"']?[0-9a-zA-Z/+]{40}"],
+    "AWS_SECRET_KEY": [r"(?i)aws(?:.{0,20})?(?:secret|private)?(?:.{0,20})?[=:\"']?[0-9a-zA-Z/+]{40}"],
     "GOOGLE_API_KEY": [r"AIza[0-9A-Za-z_-]{35}"],
     "FIREBASE_KEY": [r"AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}"],
     "AZURE_STORAGE_KEY": [r"(?i)azure(.{0,20})?(key|secret)[=:\"']?[A-Za-z0-9+/=]{88}"],
