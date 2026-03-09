@@ -1,4 +1,22 @@
-#!/usr/bin/python3                                                                                                          import re, requests, threading, argparse, os                  from concurrent.futures import ThreadPoolExecutor, as_completed                                                                                                                           parser = argparse.ArgumentParser(description="URLeaker - By HunterDep ^^")                                                  parser.add_argument("-f", "--file", required=True, help="Put file to scan. Ex: -f urls-js.txt")                             parser.add_argument("-api", "--api", action="store_true", help="Find APIKeys (Google, AWS, Firebase, etc)")                 parser.add_argument("-t", "--tokens", action="store_true", help="Find Tokens (Discord, Slack, Github, etc)")                parser.add_argument("-cr", "--credentials", action="store_true", help="Find Credentials (Email, passowrds, etc)")           parser.add_argument("-k", "--keys", action="store_true", help="Find private key")                                           parser.add_argument("-g", "--generic", action="store_true", help="Find generic API Key")                                    parser.add_argument("-html", "--html", action="store_true", help="Find intersting object html")                             args = parser.parse_args()                                                                                                  RX = "\033[35m"                                               VD = "\033[32m"                                               AZ = "\033[34m"                                               FRT = "\033[1;37m"
+#!/usr/bin/python3
+
+import re, requests, threading, argparse, os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+parser = argparse.ArgumentParser(description="URLeaker - By HunterDep ^^")
+parser.add_argument("-f", "--file", required=True, help="Put file to scan. Ex: -f urls-js.txt")
+parser.add_argument("-api", "--api", action="store_true", help="Find APIKeys (Google, AWS, Firebase, etc)")
+parser.add_argument("-t", "--tokens", action="store_true", help="Find Tokens (Discord, Slack, Github, etc)")
+parser.add_argument("-cr", "--credentials", action="store_true", help="Find Credentials (Email, passowrds, etc)")
+parser.add_argument("-k", "--keys", action="store_true", help="Find private key")
+parser.add_argument("-g", "--generic", action="store_true", help="Find generic API Key")
+parser.add_argument("-html", "--html", action="store_true", help="Find intersting object html")
+args = parser.parse_args()
+
+RX = "\033[35m"
+VD = "\033[32m"
+AZ = "\033[34m"
+FRT = "\033[1;37m"
 RST = "\033[0m"
 
 file = open(args.file, "r").read().split()
