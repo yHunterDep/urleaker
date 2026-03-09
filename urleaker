@@ -1,0 +1,105 @@
+#!/usr/bin/python3                                                                                                          import re, requests, threading, argparse, os                  from concurrent.futures import ThreadPoolExecutor, as_completed                                                                                                                           parser = argparse.ArgumentParser(description="URLeaker - By HunterDep ^^")                                                  parser.add_argument("-f", "--file", required=True, help="Put file to scan. Ex: -f urls-js.txt")                             parser.add_argument("-api", "--api", action="store_true", help="Find APIKeys (Google, AWS, Firebase, etc)")                 parser.add_argument("-t", "--tokens", action="store_true", help="Find Tokens (Discord, Slack, Github, etc)")                parser.add_argument("-cr", "--credentials", action="store_true", help="Find Credentials (Email, passowrds, etc)")           parser.add_argument("-k", "--keys", action="store_true", help="Find private key")                                           parser.add_argument("-g", "--generic", action="store_true", help="Find generic API Key")                                    parser.add_argument("-html", "--html", action="store_true", help="Find intersting object html")                             args = parser.parse_args()                                                                                                  RX = "\033[35m"                                               VD = "\033[32m"                                               AZ = "\033[34m"                                               FRT = "\033[1;37m"
+RST = "\033[0m"
+
+file = open(args.file, "r").read().split()
+
+PADRAOS = {
+
+    # === CLOUD / API KEYS ===
+    "api": {
+    "AWS_ACCESS_KEY": [r"AKIA[0-9A-Z]{16}"],
+    "AWS_SECRET_KEY": [r"(?i)aws(.{0,20})?(secret|private)?(.{0,20})?[=:\"']?[0-9a-zA-Z/+]{40}"],
+    "GOOGLE_API_KEY": [r"AIza[0-9A-Za-z_-]{35}"],
+    "FIREBASE_KEY": [r"AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}"],
+    "AZURE_STORAGE_KEY": [r"(?i)azure(.{0,20})?(key|secret)[=:\"']?[A-Za-z0-9+/=]{88}"],
+    "STRIPE_API_KEY": [r"sk_live_[0-9a-zA-Z]{24}"],
+    "SENDGRID_API_KEY":[ r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"],
+    "HEROKU_API_KEY": [r"(?i)heroku.*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}"],
+    "TWILIO_API_KEY": [r"SK[0-9a-fA-F]{32}"],
+    "OPEN_AI_USER_API_KEY": [r"sk-[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}"]
+    },
+
+    # === TOKENS ===
+    "tokens": {
+    "JWT_TOKEN": [r"eyJ[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+"],
+    "OAUTH_TOKEN": [r"ya29\.[0-9A-Za-z_-]+"],
+    "SLACK_TOKEN": [r"xox[baprs]-[0-9A-Za-z-]{10,48}"],
+    "GITHUB_TOKEN": [r"gh[pousr]_[0-9A-Za-z]{36}"],
+    "GITLAB_TOKEN": [r"glpat-[0-9A-Za-z_-]{20}"],
+    "DISCORD_TOKEN": [r"[MN][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}"],
+    "FACEBOOK_ACESS_TOKEN": [r"EAACEdEose0cBA[0-9A-Za-z]+", r"(?i)(?:facebook|fb|access[_-]?token|token)\s*[=:]\s*EA[A-Za-z0-9]{60,}"]
+    },
+
+    # === CREDENCIAIS ===
+    "cred": {
+    "EMAIL": [r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"],
+    "PASSWORD": [r"(?i)(?:password|passwd|pwd|senha|acess[o]?|pass)\s*[=:]+\s*\S{3,15}",
+    r"(?i)(?:senha|passwd|password|pwd)[_\-a-z0-9]*[:=]+\s*\S{3,15}"],
+
+    "AUTH BASIC": [r"(?i)(?:authorization|autoriza[cç][aã]o|autentica[cç][aã]o)\s*[:=]?\s*(?:basic[ao]?)\s*[:=]*\s*[a-z0-9+/=]{10,}"],
+    },
+
+    # === CHAVES PRIVADAS ===
+    "keys": {
+    "PRIVATE_KEY": [r"-----BEGIN (?:RSA|EC|DSA|OPENSSH) PRIVATE KEY-----"],
+    },
+
+    # === GENÉRICOS ===
+    "generic": {
+    "GENERIC_API_KEY": [r"(?i)(?:api[_-]?key|secret|token)\s*[=:]+\s*\S{,25}"],
+    },
+    "html": {
+    "GOOGLE DRIVE": [r"(?i)https://drive\.google\.com/file/d/\S{,50}"],
+    "INNER HTML": [r"(?i)[\w$.]+\.innerHTML\s*=\s*[^;]{1,30}"],
+    "HREF OBJECT": [r"(?i)(?:location|window\.location|document\.location)(?:\.href)?\s*=\s*[^;]{1,35}"]
+    #"HIGH_ENTROPY_STRING": r"[A-Za-z0-9+/=]{40,}"
+    }
+
+}
+
+padraos_args = {}
+
+if args.api:
+        padraos_args.update(PADRAOS["api"])
+if args.tokens:
+        padraos_args.update(PADRAOS["tokens"])
+if args.credentials:
+        padraos_args.update(PADRAOS["cred"])
+if args.keys:
+        padraos_args.update(PADRAOS["keys"])
+if args.generic:
+        padraos_args.update(PADRAOS["generic"])
+if args.html:
+        padraos_args.update(PADRAOS["html"])
+
+if not padraos_args:
+        padraos_args.update(PADRAOS["api"])
+        padraos_args.update(PADRAOS["tokens"])
+        padraos_args.update(PADRAOS["cred"])
+        padraos_args.update(PADRAOS["keys"])
+        padraos_args.update(PADRAOS["generic"])
+        padraos_args.update(PADRAOS["html"])
+
+def js_req(url):
+        try:
+                r = requests.get(url)
+        except:
+                return
+
+        for nome, regex_list in padraos_args.items():
+                for regex in regex_list:
+                        rgx = re.findall(regex, r.text)
+
+                        if rgx:
+                                rgx = list(set(rgx))
+                                rgx = f"{RST}, {RX}".join(rgx)
+                                rgx = re.findall(r"\S+", rgx) #PARA LIMPAR STRINGS COM "\t" E "\n"
+                                rgx = " ".join(rgx)
+                                print(f"{RST}[{VD}{nome}{RST}] {FRT}[{url}]{RST} [{RX}{rgx}{RST}]\n")
+
+with ThreadPoolExecutor(max_workers=20) as executor:
+    futures = [executor.submit(js_req, u) for u in file]
+
+    for future in as_completed(futures):
+        if future.result():
+                print(future.result())
