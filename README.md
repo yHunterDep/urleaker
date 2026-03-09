@@ -30,3 +30,34 @@ options:
   -g, --generic         Find generic API Key
   -html, --html         Find intersting object html
 ```
+
+# Scan All Urls
+```sh
+$ ./urleaker -f urls.txt
+[PASSWORD] [https://site.com/js/storage/y.txt] [password=1234, password=admin123]
+[EMAIL] [https://site.com/config.js] [admin@gmail.com, qwerty@gmail.com]
+[GOOGLE_API_KEY] [https://site.com/api/v2/secret.js] [AIzaAab....]
+```
+
+# Scan only ApiKeys
+```sh
+$ ./urleaker -f urls.txt -api
+[GOOGLE_API_KEY] [https://site.com/api/v2/search] [AIzaPyb....]
+[AWS_ACCESS_KEY] [https://site.com/old/users/config.json] [AKIA2CW....]
+```
+
+# Scan only Tokens
+```sh
+$ ./urleaker -f urls.txt -t
+[DISCORD_TOKEN] [https://site.com/api/saas/config/my.js] [MNDOpdF...]
+[JWT_TOKEN] [https://site.com/search] [eyJBrT...]
+```
+
+# Scan ApiKeys & Tokens
+```sh
+$ ./urleaker -f urls.txt -api -t
+[GOOGLE_API_KEY] [https://site.com/api/v2/search] [AIzaPyb....]
+[DISCORD_TOKEN] [https://site.com/api/saas/config/my.js] [MNDOpdF...]
+```
+
+Enjoy ;)
