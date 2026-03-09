@@ -3,13 +3,15 @@ URLeaker is a tool that searches for sensitive information in HTML pages using r
 Enjoy ;)
 
 # Instalation
+```sh
 git clone https://github.com/yHunterDep/urleaker/
 cd urleaker/
 chmod +x urleaker
 ./urleaker -h
+```
 
 # How to use?
-
+```sh
 usage: urleaker [-h] -f FILE [-api] [-t] [-cr] [-k] [-g]
                 [-html]
 
@@ -27,3 +29,4 @@ options:
   -k, --keys            Find private key
   -g, --generic         Find generic API Key
   -html, --html         Find intersting object html
+```
