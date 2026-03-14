@@ -55,9 +55,8 @@ PADRAOS = {
     # === CREDENCIAIS ===
     "cred": {
     "EMAIL": [r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"],
-    "PASSWORD": [r"(?i)[\"\']?(?:password|passwd|pwd|senha|acess[o]?|pass)[\"\']?\s*[=:]+\s*\S{3,15}",
-    r"(?i)[\"\']?(?:senha|passwd|password|pwd)[_\-a-z0-9]*[\"\']?\s*[:=]+\s*\S{3,15}"],
-
+    "PASSWORD": [r"(?i)[\"\']?(?:senha|passwd|password|pwd)[_\-a-z0-9]*[\"\']?\s*[:=]+\s*\S{3,15}"],
+    "FTP_PASSWORD": [r"(?i)[\'\"]?(?:(?:password|passwd|pass|senha|pwd)[_\-.\s]?ftp|ftp[_\-.]?(?:password|passwd|pass|senha|pwd))[\'\"]?\s*[=:\->]+\s*[\'\"]?[^;|]{1,35}[\'\"]?"],
     "AUTH BASIC": [r"(?i)(?:authorization|autoriza[cç][aã]o|autentica[cç][aã]o)\s*[:=]?\s*(?:basic[ao]?)\s*[:=]*\s*[a-z0-9+/=]{10,}"],
     },
 
