@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import re, requests, threading, argparse, os
+import re, requests, argparse, os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 parser = argparse.ArgumentParser(description="URLeaker - By HunterDep ^^")
@@ -20,11 +20,9 @@ FRT = "\033[1;37m"
 RST = "\033[0m"
 
 file = open(args.file, "r").read().split()
+                                                                                 PADRAOS = {
 
-PADRAOS = {
-
-    # === CLOUD / API KEYS ===
-    "api": {
+    # === CLOUD / API KEYS ===                                                       "api": {
     "AWS_ACCESS_KEY": [r"AKIA[0-9A-Z]{16}"],
     "AWS_SECRET_KEY": [r"(?i)aws(?:.{0,20})?(?:secret|private)?(?:.{0,20})?[=:\"']?[0-9a-zA-Z/+]{40}"],
     "GOOGLE_API_KEY": [r"AIza[0-9A-Za-z_-]{35}"],
@@ -57,7 +55,8 @@ PADRAOS = {
     "EMAIL": [r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"],
     "PASSWORD": [r"(?i)[\"\']?(?:senha|acesso|passwd|password|pwd)[_\-\.a-z0-9]*[\"\']?\s*[:=]+\s*[^;|]{,35}"],
     "FTP_PASSWORD": [r"(?i)[\'\"]?(?:(?:password|passwd|pass|senha|pwd)[_\-.\s]?ftp|ftp[_\-.]?(?:password|passwd|pass|senha|pwd))[\'\"]?\s*[=:\->]+\s*[\'\"]?[^;|]{1,35}[\'\"]?"],
-    "AUTH BASIC": [r"(?i)(?:authorization|autoriza[cç][aã]o|autentica[cç][aã]o)\s*[:=]?\s*(?:basic[ao]?)\s*[:=]*\s*[a-z0-9+/=]{10,}"],
+
+    "AUTH BASIC": [r"(?i)(?:authorization|autoriza[cç][aã]o|autentica[cç][aã]o|authtoken)\s*[:=]?\s*[\'\"a-z0-9+/=]{10,}"],
     },
 
     # === CHAVES PRIVADAS ===
