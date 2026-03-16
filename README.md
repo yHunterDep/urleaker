@@ -3,7 +3,7 @@
 # What's URLeaker?
 URLeaker is a tool that searches for sensitive information in HTML pages using regular expressions (regex).
 
-# Instalation
+# 💻 Instalation
 ```sh
 git clone https://github.com/yHunterDep/urleaker/
 cd urleaker/
@@ -12,7 +12,7 @@ chmod +x urleaker
 ./urleaker -h
 ```
 
-# How to use?
+# 🤔 How to use?
 ```sh
 usage: urleaker [-h] -f FILE [-api] [-t] [-cr] [-k] [-g]
                 [-html]
@@ -33,7 +33,7 @@ options:
   -html, --html         Find intersting object html
 ```
 
-# Scan All Urls
+# 📑 Scan All Urls
 ```sh
 $ ./urleaker -f urls.txt
 [PASSWORD] [https://site.com/js/storage/y.txt] [password=1234, password=admin123]
@@ -41,21 +41,21 @@ $ ./urleaker -f urls.txt
 [GOOGLE_API_KEY] [https://site.com/api/v2/secret.js] [AIzaAab....]
 ```
 
-# Scan only ApiKeys
+# 🔐 Scan only ApiKeys
 ```sh
 $ ./urleaker -f urls.txt -api
 [GOOGLE_API_KEY] [https://site.com/api/v2/search] [AIzaPyb....]
 [AWS_ACCESS_KEY] [https://site.com/old/users/config.json] [AKIA2CW....]
 ```
 
-# Scan only Tokens
+# 📑 Scan only Tokens
 ```sh
 $ ./urleaker -f urls.txt -t
 [DISCORD_TOKEN] [https://site.com/api/saas/config/my.js] [MNDOpdF...]
 [JWT_TOKEN] [https://site.com/search] [eyJBrT...]
 ```
 
-# Scan ApiKeys & Tokens
+# 💻 Scan ApiKeys & Tokens
 ```sh
 $ ./urleaker -f urls.txt -api -t
 [GOOGLE_API_KEY] [https://site.com/api/v2/search] [AIzaPyb....]
