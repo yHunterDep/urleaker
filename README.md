@@ -1,4 +1,4 @@
-!(img.jpeg)
+![urleaker](img.jpeg)
 
 # What's URLeaker?
 URLeaker is a tool that searches for sensitive information in HTML pages using regular expressions (regex).
