@@ -14,23 +14,21 @@ chmod +x urleaker
 
 # 🤔 How to use?
 ```sh
-usage: urleaker [-h] -f FILE [-api] [-t] [-cr] [-k] [-g]
-                [-html]
+usage: urleaker [-h] -f FILE [-api] [-t] [-cr] [-k] [-g] [-html]
+                [-nc]
 
 URLeaker - By HunterDep ^^
 
 options:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  Put file to scan. Ex: -f urls-js.txt
-  -api, --api           Find APIKeys (Google, AWS, Firebase,
-                        etc)
-  -t, --tokens          Find Tokens (Discord, Slack, Github,
-                        etc)
-  -cr, --credentials    Find Credentials (Email, passowrds,
-                        etc)
+  -api, --api           Find APIKeys (Google, AWS, Firebase, etc)
+  -t, --tokens          Find Tokens (Discord, Slack, Github, etc)
+  -cr, --credentials    Find Credentials (Email, passowrds, etc)
   -k, --keys            Find private key
   -g, --generic         Find generic API Key
   -html, --html         Find intersting object html
+  -nc, --no_color       Remove colors from output
 ```
 
 # 📑 Scan All Urls
