@@ -11,13 +11,17 @@ parser.add_argument("-cr", "--credentials", action="store_true", help="Find Cred
 parser.add_argument("-k", "--keys", action="store_true", help="Find private key")
 parser.add_argument("-g", "--generic", action="store_true", help="Find generic API Key")
 parser.add_argument("-html", "--html", action="store_true", help="Find intersting object html")
+parser.add_argument("-nc", "--no_color", action="store_true", help="Remove colors from output")
 args = parser.parse_args()
 
-RX = "\033[35m"
-VD = "\033[32m"
-AZ = "\033[34m"
-FRT = "\033[1;37m"
-RST = "\033[0m"
+if args.no_color:
+	RX=VD=AZ=FRT=RST=""
+else:
+	RX = "\033[35m"
+	VD = "\033[32m"
+	AZ = "\033[34m"
+	FRT = "\033[1;37m"
+	RST = "\033[0m"
 
 file = open(args.file, "r").read().split()
 
