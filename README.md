@@ -94,6 +94,10 @@ chmod +x urleaker
 ```
 
 ```bash
+./urleaker -f urls.txt -t -api
+```
+
+```bash
 ./urleaker -f urls.txt -c 50
 ```
 
