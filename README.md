@@ -27,16 +27,16 @@
 
 <pre style="background-color:#000000;color:#ffffff;padding:16px;border-radius:8px;overflow-x:auto;">
 $ ./urleaker -h
-usage: urleaker [-h] -f FILE [-tags TAGS] [-api] [-t] [-cr] [-k] [-g] [-html]
-                [-c CONCURRENT] [-s] [-nc]
+usage: urleaker [-h] -f FILE [-sv SEVERITIES] [-api] [-t] [-cr] [-k] [-g]
+                [-html] [-c CONCURRENT] [-s] [-nc]
 
 URLeaker - By HunterDep ^^
 
 options:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  Put file to scan. Ex: -f urls-js.txt
-  -tags TAGS, --tags TAGS
-                        Choice tags to scan (-tags
+  -sv SEVERITIES, --severities SEVERITIES
+                        Choice severities to scan (-sv
                         unknown,low,medium,high,critical)
   -api, --api           Find APIKeys (Google, AWS, Firebase, etc)
   -t, --tokens          Find Tokens (Discord, Slack, Github, etc)
@@ -46,9 +46,8 @@ options:
   -html, --html         Find intersting object html
   -c CONCURRENT, --concurrent CONCURRENT
                         Number of concurrent threads (default: 20)
-  -s, --silent          Skip banner mode
-  -nc, --no_color       Remove colors from output
-
+  -s, --silent          Skip banner mode                                           -nc, --no_color       Remove colors from output
+  
 $ █
 </pre>
 
@@ -91,7 +90,7 @@ chmod +x urleaker
 ```
 
 ```bash
-./urleaker -f urls.txt -tags high,critical
+./urleaker -f urls.txt -sv high,critical
 ```
 
 ```bash
