@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 parser = argparse.ArgumentParser(description="URLeaker - By HunterDep ^^")
 parser.add_argument("-f", "--file", required=True, help="Put file to scan. Ex: -f urls-js.txt")
-parser.add_argument("-tags", "--tags", help="Choice tags to scan (-tags unknown,low,medium,high,critical)")
+parser.add_argument("-sv", "--severities", help="Choice severities to scan (-sv unknown,low,medium,high,critical)")
 parser.add_argument("-api", "--api", action="store_true", help="Find APIKeys (Google, AWS, Firebase, etc)")
 parser.add_argument("-t", "--tokens", action="store_true", help="Find Tokens (Discord, Slack, Github, etc)")
 parser.add_argument("-cr", "--credentials", action="store_true", help="Find Credentials (Email, passowrds, etc)")
@@ -38,7 +38,7 @@ if not args.silent:
 
 	{FRT}A Powerfull secret scanner 🔍
 	Coded By HunterDep ^^
-	Version: 0.2.0
+	Version: 0.2
 """
 
 	print(banner)
@@ -51,9 +51,9 @@ high = f"{VR}high{RST}"
 critical = f"{FRT+VR}critical{RST}"
 
 file = open(args.file, "r").read().split()
-tags = None
-if args.tags:
-	tags = args.tags.split(",")
+severities = None
+if args.severities:
+	severities = args.severities.split(",")
 
 def user_agent():
     USER_AGENTS = [
@@ -160,12 +160,12 @@ if not padraos_args:
 	padraos_args.update(PADRAOS["generic"])
 	padraos_args.update(PADRAOS["html"])
 
-if tags:
+if severities:
 	filtro = {}
 	for k,v in padraos_args.items():
 		severity = v[1]
-		for tag in tags:
-			if tag in severity:
+		for s in severities:
+			if s in severity:
 				filtro[k] = v
 
 	padraos_args = filtro
