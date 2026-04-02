@@ -38,7 +38,7 @@ if not args.silent:
 
 	{FRT}A Powerfull secret scanner 🔍
 	Coded By HunterDep ^^
-	Version: 0.2
+	Version: 0.2.0
 """
 
 	print(banner)
