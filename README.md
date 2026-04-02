@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/status-active-brightgreen?style=for-the-badge">
   </a>
   <a href="https://github.com/yHunterDep/urleaker">
-    <img src="https://img.shields.io/badge/version-0.2-blue?style=for-the-badge">
+    <img src="https://img.shields.io/badge/version-0.2.0-blue?style=for-the-badge">
   </a>
   <a href="https://www.python.org/">
     <img src="https://img.shields.io/badge/python-3.x-purple?style=for-the-badge">
