@@ -1,21 +1,24 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-import re, requests, argparse, random, os
+import re, requests, argparse, random, os, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-parser = argparse.ArgumentParser(description="URLeaker - By HunterDep ^^")
+parser = argparse.ArgumentParser(description="URLeaker 0.2.2 - By HunterDep ^^")
 parser.add_argument("-f", "--file", required=True, help="Put file to scan. Ex: -f urls-js.txt")
-parser.add_argument("-sv", "--severities", help="Choice severities to scan (-sv unknown,low,medium,high,critical)")
+parser.add_argument("-sv", "--severity", help="Choice severities to scan (-sv unknown,low,medium,high,critical)")
 parser.add_argument("-api", "--api", action="store_true", help="Find APIKeys (Google, AWS, Firebase, etc)")
 parser.add_argument("-t", "--tokens", action="store_true", help="Find Tokens (Discord, Slack, Github, etc)")
 parser.add_argument("-cr", "--credentials", action="store_true", help="Find Credentials (Email, passowrds, etc)")
-parser.add_argument("-k", "--keys", action="store_true", help="Find private key")
 parser.add_argument("-g", "--generic", action="store_true", help="Find generic API Key")
 parser.add_argument("-html", "--html", action="store_true", help="Find intersting object html")
+parser.add_argument("-st", "--social_takeover", action="store_true", help="Find social media profiles for potential takeover (Instagram, TikTok, X, LinkedIn, YouTube)")
+parser.add_argument("-dc", "--dep_confusion", action="store_true", help="Find possible dependency confusion targets")
 parser.add_argument("-c", "--concurrent", help="Number of concurrent threads (default: 20)", default=20, type=int)
 parser.add_argument("-s", "--silent", action="store_true", help="Skip banner mode")
 parser.add_argument("-nc", "--no_color", action="store_true", help="Remove colors from output")
+parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output (detailed matches and additional context)")
 args = parser.parse_args()
+verbose = args.verbose
 
 if args.no_color:
 	VD=AZ=VR=AM=FRT=RST=""
@@ -27,6 +30,9 @@ else:
 	AM = "\033[33m"
 	FRT = "\033[1;37m"
 	RST = "\033[0m"
+vm = f"[{FRT+VD}VERBOSE{RST}]"
+if args.silent and verbose:
+	print(f"{VR}Error:{RST} You don't use {AM}'-v'{RST} next to {AM}'--silent'{RST}.", file=sys.stderr);quit()
 
 if not args.silent:
 	banner = fr"""{AZ}
@@ -36,12 +42,12 @@ if not args.silent:
 / /_/ / _, _/ /___/  __/ /_/ / ,< /  __/ /
 \____/_/ |_/_____/\___/\__,_/_/|_|\___/_/{RST}
 
-	{FRT}A Powerfull secret scanner 🔍
+	{FRT}A Powerfull secret scanner
 	Coded By HunterDep ^^
-	Version: 0.2.0
+	Version: 0.2.2
 """
 
-	print(banner)
+	print(banner, file=sys.stderr)
 
 unknown = f"unknown"
 info = f"{AZ}info{RST}"
@@ -49,11 +55,16 @@ low = f"{VD}low{RST}"
 medium = f"{AM}medium{RST}"
 high = f"{VR}high{RST}"
 critical = f"{FRT+VR}critical{RST}"
+found = 0
 
-file = open(args.file, "r").read().split()
+try:
+	file = open(args.file, "r").read().split()
+except Exception as e:
+	print(f"{VR}Error:{RST} {e}", file=sys.stderr)
+	quit()
 severities = None
-if args.severities:
-	severities = args.severities.split(",")
+if args.severity:
+	severities = args.severity.split(",")
 
 def user_agent():
     USER_AGENTS = [
@@ -72,16 +83,16 @@ PADRAOS = {
     # === CLOUD / API KEYS ===
     "api": {
     "AWS_ACCESS_KEY": [[r"AKIA[0-9A-Z]{16}"], low],
-    "AWS_SECRET_KEY": [[r"(?i)aws(?:.{0,20})?(?:secret|private)?(?:.{0,20})?[=:\"']?[0-9a-zA-Z/+]{40}"],high],
+    "AWS_SECRET_KEY": [[r"(?i)(?:aws|amazon).{0,20}(?:secret|access).{0,20}(?:key|token)\s*[:=]\s*[\"']?[A-Za-z0-9/+=]{40}[\"']?"],critical],
     "GOOGLE_API_KEY": [[r"AIza[0-9A-Za-z_-]{35}"], medium],
     "FIREBASE_KEY": [[r"AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}"], high],
-    "AZURE_STORAGE_KEY": [[r"(?i)azure(.{0,20})?(key|secret)[=:\"']?[A-Za-z0-9+/=]{88}"],high],
+    "AZURE_STORAGE_KEY": [[r"(?i)azure(?:.{0,20})?(?:key|secret)[=:\"']?[A-Za-z0-9+/=]{88}"],high],
     "STRIPE_PUBLISHABLE_KEY": [[r"pk_live_[0-9a-zA-Z]{24}"], low],
     "STRIPE_SECRET_KEY": [[r"sk_live_[0-9a-zA-Z]{24}"],high],
     "SENDGRID_API_KEY": [[r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"],medium],
     "HEROKU_API_KEY": [[r"(?i)heroku.*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}"],high],
     "TWILIO_API_KEY": [[r"SK[0-9a-fA-F]{32}"],high],
-    "OPEN_AI_USER_API_KEY": [[r"sk-[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}"], medium],
+    "OPEN_AI_USER_API_KEY": [[r"sk-[A-Za-z0-9]{48,}"], medium],
     "MAILGUN_API_KEY": [[r"key-[0-9a-zA-Z]{32}"],medium],
     "LINEAR_API_KEY": [[r"lin_api_[a-zA-Z0-9]{40}"], medium],
     "RIOT_GAMES_API_KEY": [[r"RGAPI-[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"], medium]
@@ -89,7 +100,7 @@ PADRAOS = {
 
     # === TOKENS ===
     "tokens": {
-    "JWT_TOKEN": [[r"eyJ[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+"],info],
+    "JWT_TOKEN": [[r"eyJ[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+"],low],
     "OAUTH_TOKEN": [[r"ya29\.[0-9A-Za-z_-]+"],high],
     "SLACK_TOKEN": [[r"xox[baprs]-[0-9A-Za-z-]{10,48}"],high],
     "GITHUB_TOKEN": [[r"gh[pousr]_[0-9A-Za-z]{36}"], medium],
@@ -104,7 +115,9 @@ PADRAOS = {
     "DIGITAL_OCEAN_TOKEN": [[r"dop_v1_[a-z0-9]{64}"], critical],
     "TELEGRAM_BOT_TOKEN": [[r"\d{9}:[a-zA-Z0-9_-]{35}"], medium],
     "DROPBOX_ACCESS_TOKEN": [[r"sl\.[A-Za-z0-9_-]{20,100}"], critical],
-    "ASANA_PERSONAL_ACCESS_TOKEN": [[r"0/[0-9a-z]{32}"], medium]
+    "ASANA_PERSONAL_ACCESS_TOKEN": [[r"0/[0-9a-z]{32}"], medium],
+    "AZURE_CLIENT_SECRET": [[r"(?i)azure(.{0,20})?client.secret(.{0,20})?['\"][a-zA-Z0-9._%+-]{32,}['\"]"], high],
+    "PRIVATE_KEY": [[r"-----BEGIN (?:RSA|EC|DSA|OPENSSH) PRIVATE KEY-----"], critical]
     },
 
     # === CREDENCIAIS ===
@@ -116,23 +129,38 @@ PADRAOS = {
     "AUTH BASIC": [[r"(?i)(?:authorization|autoriza[cç][aã]o|autentica[cç][aã]o|authtoken)\s*[:=]?\s*[\'\"a-z0-9+/=]{10,}"], info],
     },
 
-    # === CHAVES PRIVADAS ===
-    "keys": {
-    "PRIVATE_KEY": [[r"-----BEGIN (?:RSA|EC|DSA|OPENSSH) PRIVATE KEY-----"], critical],
-    "AZURE_CLIENT_SECRET": [[r"(?i)azure(.{0,20})?client.secret(.{0,20})?['\"][a-zA-Z0-9._%+-]{32,}['\"]"], high]
-    },
-
     # === GENÉRICOS ===
     "generic": {
-    "GENERIC_API_KEY": [[r"(?i)[\"\']?(?:api[_-]?key|secret|token|auth[_-]?token)[\"\']?\s*[=:]+\s*\S{,35}"], unknown],
+    "GENERIC_API_KEY": [[r"(?i)[\"\']?(?:api[_-]?key|secret|token|auth[_-]?token)[\"\']?\s*[=:]\s*[\"\']?[A-Za-z0-9_\-]{8,}[\"\']?"], unknown],
     "LOCALHOST_REFERENCE": [[r"localhost:[0-9]{2,5}"], info],
+    "IP_ADDRESS": [[r"\d{1,3}(?:\.\d{1,3}){3}"], info],
     "AWS_S3_BUCKET_URL": [[r"s3:\/\/[a-z0-9\-\.]{3,63}"], low]
     },
     "html": {
     "GOOGLE DRIVE": [[r"(?i)https://drive\.google\.com/file/d/\S{,50}"], low],
     "INNER HTML": [[r"(?i)[\w$.]+\.innerHTML\s*=\s*[^;]{1,30}"], info],
-    "HREF OBJECT": [[r"(?i)(?:location|window\.location|document\.location)(?:\.href)?\s*=\s*[^;]{1,35}"], info]
-    #"HIGH_ENTROPY_STRING": r"[A-Za-z0-9+/=]{40,}"
+    "HREF OBJECT": [[r"(?i)(?:location|window\.location|document\.location)(?:\.href)?\s*=\s*[^;]{1,35}"], info],
+    "ADMIN_PAGE": [[r"[/]?(?:admin|adm|login_admin|admin_login|staff)[/]+[^;\s\"']*"], low],
+    "ENV_VAR": [[r"(?i)process\.env\.([a-z0-9_]+)"], medium]
+    },
+
+    "dependency_confusion": {
+    "JAVASCRIPT_PACKAGE": [[r'import\s+(?:.*?\s+from\s+)?[\"\']([^\"\']+)[\"\']', r'require\([\"\']([^\"\']+)[\"\']\)', r'import\(\s*[\"\']([^\"\']+)[\"\']\s*\)', r'export\s+.*?\s+from\s+[\"\']([^\"\']+)[\"\']'], low],
+    "SCOPED_PACKAGE": [[r"@[\w\-.]+\/[\w\-.]+"], low],
+    "SCRIPT_SRC": [[r'<script[^>]+src=[\"\']([^\"\']+)[\"\']'], info],
+    "WEBPACK_MODULE": [[r'__webpack_require__\([\"\']([^\"\']+)[\"\']\)'], medium],
+    "SOURCE_MAP": [[r'\/\/# sourceMappingURL=([^\s]+)'], low],
+    },
+
+    "social_takeover": {
+    "GOOGLE_PLAY_STORE": [[r"https?://play\.google\.com/store/apps/details\?id=[a-zA-Z0-9._]+"], low],
+    "APPLE_STORE": [[r"https?://apps\.apple\.com/[a-zA-Z0-9/-]+"], low],
+    "GITHUB_REPO": [[r"https?://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"], info],
+    "INSTAGRAM_USER": [[r"https?://(?:www\.)?instagram\.com/([A-Za-z0-9._]+)/?"], info],
+    "TIKTOK_USER": [[r"https?://(?:www\.)?tiktok\.com/@([A-Za-z0-9._]+)/?"], info],
+    "X_USER": [[r"https?://(?:www\.)?(?:x\.com|twitter\.com)/(?!home|explore|notifications|messages|settings|i/|search)([A-Za-z0-9_]{1,15})/?"],info],
+    "LINKEDIN_USER": [[r"https?://(?:www\.)?linkedin\.com/(?:in|company|school)/([A-Za-z0-9-_%]+)"], low],
+    "YOUTUBE_CHANNEL": [[r"https?://(?:www\.)?youtube\.com/@([A-Za-z0-9._-]+)", r"https?://(?:www\.)?youtube\.com/user/([A-Za-z0-9_-]+)"], low]
     }
 
 }
@@ -145,20 +173,23 @@ if args.tokens:
 	padraos_args.update(PADRAOS["tokens"])
 if args.credentials:
 	padraos_args.update(PADRAOS["cred"])
-if args.keys:
-	padraos_args.update(PADRAOS["keys"])
 if args.generic:
 	padraos_args.update(PADRAOS["generic"])
 if args.html:
 	padraos_args.update(PADRAOS["html"])
+if args.dep_confusion:
+	padraos_args.update(PADRAOS["dependency_confusion"])
+if args.social_takeover:
+	padraos_args.update(PADRAOS["social_takeover"])
 
 if not padraos_args:
 	padraos_args.update(PADRAOS["api"])
 	padraos_args.update(PADRAOS["tokens"])
 	padraos_args.update(PADRAOS["cred"])
-	padraos_args.update(PADRAOS["keys"])
 	padraos_args.update(PADRAOS["generic"])
 	padraos_args.update(PADRAOS["html"])
+	padraos_args.update(PADRAOS["dependency_confusion"])
+	padraos_args.update(PADRAOS["social_takeover"])
 
 if severities:
 	filtro = {}
@@ -171,8 +202,11 @@ if severities:
 	padraos_args = filtro
 
 def js_req(url):
+	global found
 	try:
 		r = requests.get(url, headers=user_agent(), timeout=5)
+		if verbose:
+			print(f"{vm} Request made to: {url}, {AM}{r.status_code}{RST}\n", file=sys.stderr)
 	except:
 		return
 
@@ -188,6 +222,9 @@ def js_req(url):
 				rgx = f"{RST}, {FRT+AZ}".join(rgx)
 				rgx = " ".join(rgx.split())
 				print(f"{RST}[{VD}{nome}{RST}] ({severity}) {FRT}[{url}]{RST} [{FRT+AZ}{rgx}{RST}]\n", flush=True)
+				found += 1
+			else:
+				if verbose: print(f"{vm} Not found {VR}{nome}{RST} patterns in {url} !\n", file=sys.stderr)
 
 with ThreadPoolExecutor(max_workers=args.concurrent) as executor:
     futures = [executor.submit(js_req, u) for u in file]
@@ -195,3 +232,5 @@ with ThreadPoolExecutor(max_workers=args.concurrent) as executor:
     for future in as_completed(futures):
         if future.result():
 	        print(future.result())
+
+print(f"\n[{FRT+AM}!{RST}] {found} patterns found!")
