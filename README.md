@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>A powerful secret scanner for HTTP responses</b><br>
-  API Keys • Tokens • Credentials • Misconfigurations
+  API Keys • Tokens • Credentials • Misconfigurations • Recon
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/status-active-brightgreen?style=for-the-badge">
   </a>
   <a href="https://github.com/yHunterDep/urleaker">
-    <img src="https://img.shields.io/badge/version-0.2.0-blue?style=for-the-badge">
+    <img src="https://img.shields.io/badge/version-0.2.2-blue?style=for-the-badge">
   </a>
   <a href="https://www.python.org/">
     <img src="https://img.shields.io/badge/python-3.x-purple?style=for-the-badge">
@@ -27,27 +27,32 @@
 
 <pre style="background-color:#000000;color:#ffffff;padding:16px;border-radius:8px;overflow-x:auto;">
 $ ./urleaker -h
-usage: urleaker [-h] -f FILE [-sv SEVERITIES] [-api] [-t] [-cr] [-k] [-g]
-                [-html] [-c CONCURRENT] [-s] [-nc]
 
-URLeaker - By HunterDep ^^
+usage: urleaker [-h] -f FILE [-sv SEVERITY] [-api] [-t] [-cr] [-g] [-html] [-st] [-dc]
+                [-c CONCURRENT] [-s] [-nc] [-v]
+
+URLeaker 0.2.2 - By HunterDep ^^
 
 options:
   -h, --help            show this help message and exit
-  -f FILE, --file FILE  Put file to scan. Ex: -f urls-js.txt
-  -sv SEVERITIES, --severities SEVERITIES
-                        Choice severities to scan (-sv
-                        unknown,low,medium,high,critical)
+  -f, --file FILE       Put file to scan. Ex: -f urls-js.txt
+  -sv, --severity SEVERITY
+                        Choice severities to scan (-sv unknown,low,medium,high,critical)
   -api, --api           Find APIKeys (Google, AWS, Firebase, etc)
   -t, --tokens          Find Tokens (Discord, Slack, Github, etc)
   -cr, --credentials    Find Credentials (Email, passowrds, etc)
-  -k, --keys            Find private key
   -g, --generic         Find generic API Key
   -html, --html         Find intersting object html
-  -c CONCURRENT, --concurrent CONCURRENT
+  -st, --social_takeover
+                        Find social media profiles for potential takeover (Instagram, TikTok,
+                        X, LinkedIn, YouTube)
+  -dc, --dep_confusion  Find possible dependency confusion targets
+  -c, --concurrent CONCURRENT
                         Number of concurrent threads (default: 20)
-  -s, --silent          Skip banner mode                                           -nc, --no_color       Remove colors from output
-  
+  -s, --silent          Skip banner mode
+  -nc, --no_color       Remove colors from output
+  -v, --verbose         Enable verbose output (detailed matches and additional context)
+
 $ █
 </pre>
 
@@ -78,11 +83,7 @@ chmod +x urleaker
 ```
 
 ```bash
-./urleaker -f urls.txt -api
-```
-
-```bash
-./urleaker -f urls.txt -t
+./urleaker -f urls.txt -api -t
 ```
 
 ```bash
@@ -94,37 +95,48 @@ chmod +x urleaker
 ```
 
 ```bash
-./urleaker -f urls.txt -sv low,medium
+./urleaker -f urls.txt -dc
 ```
 
 ```bash
-./urleaker -f urls.txt -t -api
+./urleaker -f urls.txt -st
+```
+
+```bash
+./urleaker -f urls.txt -v
 ```
 
 ```bash
 ./urleaker -f urls.txt -c 50
 ```
 
-```bash
-./urleaker -f urls.txt -s
-```
-
-```bash
-./urleaker -f urls.txt -nc
-```
-
 ---
 
 ## 🧠 Features
 
-- 🌐 Scans **any HTTP response body** (not limited to JS)
-- 🔑 API Key detection (AWS, Google, Stripe, etc)
-- 🔐 Token leaks (Discord, GitHub, Slack, JWT)
-- 📧 Credentials (emails, passwords, FTP)
-- 🔒 Private keys detection
-- 🧩 Generic secrets & misconfig patterns
+- 🌐 Scan **any HTTP response body**
+- 🔑 API key detection (AWS, Google, Stripe, Azure, etc)
+- 🔐 Token leaks (Discord, GitHub, Slack, JWT, OAuth)
+- 📧 Credentials (emails, passwords, FTP leaks)
+- 🔒 Private keys & sensitive secrets
+- 🧩 Generic secrets & environment variables
+- 🧠 Dependency confusion detection
+- 🌍 Social media takeover discovery
 - ⚡ Multithreaded scanning
-- 🎯 Severity filtering (low → critical)
+- 🎯 Severity filtering system
+- 🧾 Verbose mode for deep analysis
+
+---
+
+## 🆕 What's New (v0.2.2)
+
+- ➕ Added **dependency confusion detection** (`-dc`)
+- ➕ Added **social takeover module** (`-st`)
+- ➕ Added **verbose mode** (`-v`)
+- ➕ Improved AWS/Azure detection regex
+- ➕ Better output handling & stability
+- ➕ Cleaner CLI structure
+- ➕ More patterns and coverage
 
 ---
 
@@ -141,11 +153,13 @@ https://site.com/index.html
 ## 📤 Example Output
 
 ```bash
-[AWS_SECRET_KEY] (high) [https://target.com/api] [ABCD1234...]
+[AWS_SECRET_KEY] (critical) [https://target.com/api] [AMAZON_SECRET_KEY=agF...]
 
 [DISCORD_TOKEN] (critical) [https://target.com/script.js] [MTIzNDU2...]
 
 [EMAIL] (info) [https://target.com/page] [admin@example.com]
+
+[WEBPACK_MODULE] (medium) [https://target.com/app.js] [./internal/module]
 ```
 
 ---
