@@ -155,11 +155,20 @@ https://site.com/index.html
 ```bash
 [AWS_SECRET_KEY] (critical) [https://target.com/api] [AMAZON_SECRET_KEY=agF...]
 
+[FACEBOOK_ACCESS_TOKEN] (high) [https://target.com/modules/path/dom.php] [EAACE
+..]
+
 [DISCORD_TOKEN] (critical) [https://target.com/script.js] [MTIzNDU2...]
 
 [EMAIL] (info) [https://target.com/page] [admin@example.com]
 
 [WEBPACK_MODULE] (medium) [https://target.com/app.js] [./internal/module]
+
+[SCOPED_PACKAGE] (low) [https://target.com/app.js] [@company/internal-api]
+
+[JAVASCRIPT_PACKAGE] (low) [https://target.com/app.js] [lodash]
+
+[OPEN_AI_USER_API_KEY] (medium) [https://api.target.com/script.js] [sk-4Fj28LmN0...]
 ```
 
 ---
